@@ -1,12 +1,13 @@
 import sys
 
-from .logging_utils import LOGGER, setup_logging
+from .logging import LOGGER, setup_logging
 
 setup_logging("debug")
 LOGGER.info(f"Running on python {sys.version}")
 
 try:
-    from .LeadControl import LeadControl
+    from .specification import Specification
+    from .lead_control import LeadControl
 except Exception as e:
     LOGGER.exception(e)
     raise
@@ -15,7 +16,7 @@ except Exception as e:
 def create_instance(c_instance):
     """ Creates and returns the LeadControl script """
     try:
-        return LeadControl(c_instance)
+        return LeadControl(c_instance=c_instance)
     except Exception as e:
         LOGGER.exception(e)
         raise
