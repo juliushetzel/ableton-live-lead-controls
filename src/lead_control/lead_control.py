@@ -30,15 +30,6 @@ class LeadControl(ControlSurface):
         self._LeadControl__on_devices_changed.subject = self.song.view.selected_track
         self._index_lead_controls()
 
-    # @log_function_call()
-    # def _create_component(self, name, component_mappings):
-    #     should_enable = component_mappings.pop("enable", True)
-    #     component = self.component_map[name]
-    #     component.layer = Layer(**component_mappings)
-    #     for name, element in iteritems(component_mappings):
-    #         LOGGER.info(f"element: {name}, {get_element(element)}")
-    #     component.set_enabled(should_enable)
-
     @listens("tracks")
     def __on_tracks_changed(self):
         LOGGER.info(f"Tracks changed: {[track.name for track in self.song.tracks]}")
@@ -81,5 +72,5 @@ class LeadControl(ControlSurface):
         for device in track.devices:
             if device.name == "Lead Control":
                 LOGGER.info(f"Found Lead Control device for {tag}")
-                component: DeviceComponent = self.component_map[f"LeadControls"]
+                component: DeviceComponent = self.component_map["LeadControls"]
                 component.set_device(tag, device)
