@@ -1,11 +1,11 @@
-from typing import List, Dict
+from typing import Dict
 
-from ableton.v2.base import listens_group
 from ableton.v3.control_surface import Component
 from ableton.v3.control_surface.controls import (
     control_list,
     MappedControl
 )
+from ableton.v3.live.action import toggle_or_cycle_parameter_value
 
 from .logging import log_function_call, LOGGER
 from .tag import LeadControlTag
@@ -35,29 +35,25 @@ class DeviceComponent(Component):
     ):
         super().__init__(name="LeadControls", *args, **kwargs)
         self._devices: Dict[LeadControlTag, any] = {}
+        self._reset_parameters: Dict[LeadControlTag, any] = {}
+
+    def reset_all_devices(self):
+        for parameter in self._reset_parameters.values():
+            LOGGER.info(f"Resetting parameter {parameter.name}, {parameter.is_enabled}, {parameter.state}")
+            toggle_or_cycle_parameter_value(parameter)
+            toggle_or_cycle_parameter_value(parameter)
 
     @log_function_call()
     def set_device(self, tag: LeadControlTag, device):
         self._devices[tag] = device
-        all_parameters = self._all_parameters()
-        self._on_parameter_value_changed.replace_subjects(all_parameters)
         self._assign_device_to_controls(tag, device)
-
-    def _all_parameters(self) -> List[any]:
-        return [
-            parameter
-            for device
-            in list(self._devices.values())
-            for parameter
-            in device.parameters
-        ]
 
     def _assign_device_to_controls(self, tag: LeadControlTag, device):
         encoders = self._get_encoders(tag)
         reset_button = self._get_reset_button(tag)
         for parameter in device.parameters:
-            LOGGER.info(f"Param {parameter.name}")
             if parameter.name == "button_reset":
+                self._reset_parameters[tag] = parameter
                 reset_button.mapped_parameter = parameter
                 LOGGER.info(f"Mapped '{tag}/{device.name}/{parameter.name}' to 'button'")
             if parameter.name.isdigit():
@@ -73,8 +69,3 @@ class DeviceComponent(Component):
 
     def _get_reset_button(self, tag: LeadControlTag):
         return getattr(self, f"{tag.name.lower()}_reset_button")
-
-    @listens_group('value')
-    def _on_parameter_value_changed(self, parameter):
-        # LOGGER.info(f"{self} - Param changes {parameter}")
-        pass

@@ -1,16 +1,14 @@
-from typing import Union
 import re
+from typing import Union
 
 from ableton.v2.base import listens
 from ableton.v3.control_surface import (
-    ControlSurface, Layer,
-)
-from ableton.v3.control_surface.components import SessionComponent, SessionRingComponent, SessionNavigationComponent, \
-    SceneComponent
+    ControlSurface, )
+from ableton.v3.live import flatten_device_chain
 
-from .specification import Specification
 from .device_component import DeviceComponent
 from .logging import LOGGER, log_function_call
+from .specification import Specification
 from .tag import LeadControlTag
 
 
@@ -24,24 +22,20 @@ class LeadControl(ControlSurface):
 
     def setup(self):
         super().setup()
-        self._LeadControl__on_tracks_changed.subject = self.song
         self._LeadControl__on_selected_track_changed.subject = self.song.view
         self._LeadControl__on_devices_changed.subject = self.song.view.selected_track
         self._index_lead_controls()
-
-    @listens("tracks")
-    def __on_tracks_changed(self):
-        LOGGER.info(f"Tracks changed: {[track.name for track in self.song.tracks]}")
+        device_component = self.component_map["LeadControls"]
+        performance_component = self.component_map["PerformanceControls"]
+        performance_component.set_reset_all_devices_callback(device_component.reset_all_devices)
 
     @listens("selected_track")
     def __on_selected_track_changed(self):
-        LOGGER.info(f"Selected track changed: {self.song.view.selected_track.name}")
         self._LeadControl__on_devices_changed.subject = self.song.view.selected_track
 
     @listens("devices")
     def __on_devices_changed(self):
         selected_track = self.song.view.selected_track
-        LOGGER.info(f"Devices changed: {[device.name for device in selected_track.devices]}")
         tag = self._get_track_lead_control_tag(selected_track)
         if tag is not None:
             LOGGER.info(f"Found LC track {tag}")
@@ -68,8 +62,7 @@ class LeadControl(ControlSurface):
 
     @log_function_call()
     def _setup_lead_control_track(self, track: any, tag: LeadControlTag):
-        for device in track.devices:
+        for device in flatten_device_chain(track):
             if device.name == "Lead Control":
-                LOGGER.info(f"Found Lead Control device for {tag}")
                 component: DeviceComponent = self.component_map["LeadControls"]
                 component.set_device(tag, device)
