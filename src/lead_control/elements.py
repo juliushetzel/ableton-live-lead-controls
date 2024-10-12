@@ -66,6 +66,11 @@ class Elements(ElementsBase):
             ],
             base_name="Lc5_Encoders"
         )
+
+        self.add_button(49, channel=2, name="reset_all_button", is_rgb=False, is_momentary=True)
+        self.add_button(50, channel=2, name="previous_scene_button", is_rgb=False, is_momentary=True)
+        self.add_button(51, channel=2, name="switch_button", is_rgb=False, is_momentary=True)
+        self.add_button(52, channel=2, name="next_scene_button", is_rgb=False, is_momentary=True)
         #
         # add_button_matrix(
         #     [list(range(9, 16 + 1))],

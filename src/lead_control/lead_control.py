@@ -1,13 +1,12 @@
 from typing import Union
 import re
-from future.utils import iteritems
 
-from ableton.v2.control_surface import get_element
 from ableton.v2.base import listens
 from ableton.v3.control_surface import (
     ControlSurface, Layer,
 )
-from ableton.v3.control_surface.components import SessionComponent
+from ableton.v3.control_surface.components import SessionComponent, SessionRingComponent, SessionNavigationComponent, \
+    SceneComponent
 
 from .specification import Specification
 from .device_component import DeviceComponent
