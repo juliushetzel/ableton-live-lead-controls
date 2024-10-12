@@ -1,1 +1,1 @@
-tail -f "$HOME/Library/Preferences/Ableton/Live 11.3.30/Log.txt"
+tail -f "$HOME/Library/Preferences/Ableton/Live 11.3.35/Log.txt"
