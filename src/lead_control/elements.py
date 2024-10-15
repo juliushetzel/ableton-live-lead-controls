@@ -24,27 +24,24 @@ class Elements(ElementsBase):
 
         add_encoder_matrix(
             [
-                [33, 34],
-                [41, 42],
-                [49, 50]
+                [33, 41, 49],
+                [34, 42, 50]
             ],
             base_name="Lc1_Encoders"
         )
 
         add_encoder_matrix(
             [
-                [35, 36],
-                [43, 44],
-                [51, 52]
+                [35, 43, 51],
+                [36, 44, 52]
             ],
             base_name="Lc2_Encoders"
         )
 
         add_encoder_matrix(
             [
-                [37, 38],
-                [45, 46],
-                [53, 54]
+                [37, 45, 53],
+                [38, 46, 54]
             ],
             base_name="Lc3_Encoders"
         )
@@ -66,7 +63,7 @@ class Elements(ElementsBase):
             ],
             base_name="Lc5_Encoders"
         )
-        self.add_button(00, channel=2, name="navigation_switch_button", is_rgb=False, is_momentary=True)
+        self.add_button(33, channel=2, name="navigation_switch_button", is_rgb=False, is_momentary=True)
 
         self.add_button(49, channel=2, name="reset_all_button", is_rgb=False, is_momentary=True)
         self.add_button(50, channel=2, name="previous_scene_button", is_rgb=False, is_momentary=True)

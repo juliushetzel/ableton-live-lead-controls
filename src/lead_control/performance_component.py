@@ -1,11 +1,14 @@
+from itertools import count
 from threading import Thread
 from typing import Callable
 
-from ableton.v2.base import listens
+from ableton.v2.base import listens, listens_group
 from ableton.v3.control_surface import Component, Layer
 from ableton.v3.control_surface.components import SessionComponent, SessionRingComponent, SessionNavigationComponent
 from ableton.v3.control_surface.controls import ButtonControl
 from ableton.v3.live import action
+
+from .logging import LOGGER
 
 
 class PerformanceComponent(Component):
@@ -56,11 +59,12 @@ class PerformanceComponent(Component):
 
     @listens("offset")
     def __on_session_ring_offset_changed(self, _: int, vertical_offset: int):
+        scene = self.song.scenes[vertical_offset]
+        self._session.selected_scene().set_scene(scene)
+
         if self.button_navigation_switch.is_pressed:
             return
 
-        scene = self.song.scenes[vertical_offset]
-        self._session.selected_scene().set_scene(scene)
         if self.button_performance_switch.is_pressed:
             self._PerformanceComponent__on_scene_triggered_changed.subject = scene
             self._reset_all_on_next_scene_launch = True
@@ -76,5 +80,6 @@ class PerformanceComponent(Component):
         self._reset_all_on_next_scene_launch = False
 
         if reset_all_on_next_scene_launch:
+            LOGGER.info("Resetting all")
             Thread(target=self._reset_all_devices_callback).start()
         self._PerformanceComponent__on_scene_triggered_changed.subject = None

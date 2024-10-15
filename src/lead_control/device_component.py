@@ -47,10 +47,10 @@ class DeviceComponent(Component):
         }
 
     def reset_all_devices(self):
-        for parameter in self._reset_parameters.values():
-            LOGGER.info(f"Resetting parameter {parameter.name}, {parameter.is_enabled}, {parameter.state}")
-            toggle_or_cycle_parameter_value(parameter)
-            toggle_or_cycle_parameter_value(parameter)
+        for tag, parameter in self._reset_parameters.items():
+            if parameter is not None:
+                toggle_or_cycle_parameter_value(parameter)
+                toggle_or_cycle_parameter_value(parameter)
 
     @log_function_call()
     def set_device(self, tag: LeadControlTag, device):
