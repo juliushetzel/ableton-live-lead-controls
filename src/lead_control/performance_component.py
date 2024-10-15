@@ -9,7 +9,8 @@ from ableton.v3.live import action
 
 
 class PerformanceComponent(Component):
-    button_switch = ButtonControl()
+    button_navigation_switch = ButtonControl()
+    button_performance_switch = ButtonControl()
     button_reset_all = ButtonControl()
 
     def __init__(
@@ -19,7 +20,6 @@ class PerformanceComponent(Component):
     ):
         super().__init__(name="PerformanceControls", *args, **kwargs)
         self._reset_all_devices_callback: Callable[[], None] = lambda: None
-        self._switch_enabled: bool = False
         self._reset_all_on_next_scene_launch: bool = False
         self._session_ring = SessionRingComponent(
             name='Session_Ring',
@@ -46,27 +46,24 @@ class PerformanceComponent(Component):
     def set_reset_all_devices_callback(self, callback: Callable[[], None]):
         self._reset_all_devices_callback = callback
 
-    @button_switch.pressed
-    def _on_switch_pressed(self, _):
-        self._switch_enabled = True
-
-    @button_switch.released
-    def _on_switch_released(self, _):
-        self._switch_enabled = False
-
     @button_reset_all.pressed
     def _on_reset_all_pressed(self, _):
-        self._reset_all_devices_callback()
+        if self.button_navigation_switch.is_pressed:
+            selected_scene = self._session.selected_scene().scene
+            action.fire(selected_scene, button_state=True)
+        else:
+            self._reset_all_devices_callback()
 
     @listens("offset")
     def __on_session_ring_offset_changed(self, _: int, vertical_offset: int):
+        if self.button_navigation_switch.is_pressed:
+            return
+
         scene = self.song.scenes[vertical_offset]
         self._session.selected_scene().set_scene(scene)
-        if self._switch_enabled:
+        if self.button_performance_switch.is_pressed:
             self._PerformanceComponent__on_scene_triggered_changed.subject = scene
             self._reset_all_on_next_scene_launch = True
-        else:
-            self._PerformanceComponent__on_scene_triggered_changed.subject = None
         action.fire(scene, button_state=True)
 
     @listens("is_triggered")
@@ -80,3 +77,4 @@ class PerformanceComponent(Component):
 
         if reset_all_on_next_scene_launch:
             Thread(target=self._reset_all_devices_callback).start()
+        self._PerformanceComponent__on_scene_triggered_changed.subject = None

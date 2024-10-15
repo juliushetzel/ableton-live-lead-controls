@@ -66,28 +66,9 @@ class Elements(ElementsBase):
             ],
             base_name="Lc5_Encoders"
         )
+        self.add_button(00, channel=2, name="navigation_switch_button", is_rgb=False, is_momentary=True)
 
         self.add_button(49, channel=2, name="reset_all_button", is_rgb=False, is_momentary=True)
         self.add_button(50, channel=2, name="previous_scene_button", is_rgb=False, is_momentary=True)
-        self.add_button(51, channel=2, name="switch_button", is_rgb=False, is_momentary=True)
+        self.add_button(51, channel=2, name="performance_switch_button", is_rgb=False, is_momentary=True)
         self.add_button(52, channel=2, name="next_scene_button", is_rgb=False, is_momentary=True)
-        #
-        # add_button_matrix(
-        #     [list(range(9, 16 + 1))],
-        #     base_name="Master_buttons"
-        # )
-        #
-        # add_button_matrix(
-        #     [list(range(17, 24 + 1))],
-        #     base_name="LC_Buttons"
-        # )
-        #
-        # add_encoder_matrix(
-        #     [list(range(33, 56 + 1))],
-        #     base_name="Device_Controls"
-        # )
-        #
-        # add_button_matrix(
-        #     [list(range(49, 52 + 1))],
-        #     base_name="Session_Buttons"
-        # )

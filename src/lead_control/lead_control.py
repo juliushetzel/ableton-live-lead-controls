@@ -12,7 +12,12 @@ from .specification import Specification
 from .tag import LeadControlTag
 
 
+# TODO navigation
+# TODO reload devices
+# TODO midi devices updaten, audio effect parameter Namen?
+
 class LeadControl(ControlSurface):
+    _LEAD_CONTROL_M4L_DEVICE_NAME = "Lead Control"
 
     @log_function_call()
     def __init__(self, c_instance):
@@ -24,10 +29,10 @@ class LeadControl(ControlSurface):
         super().setup()
         self._LeadControl__on_selected_track_changed.subject = self.song.view
         self._LeadControl__on_devices_changed.subject = self.song.view.selected_track
+        self._device_component = self.component_map["LeadControls"]
         self._index_lead_controls()
-        device_component = self.component_map["LeadControls"]
         performance_component = self.component_map["PerformanceControls"]
-        performance_component.set_reset_all_devices_callback(device_component.reset_all_devices)
+        performance_component.set_reset_all_devices_callback(self._device_component.reset_all_devices)
 
     @listens("selected_track")
     def __on_selected_track_changed(self):
@@ -50,19 +55,31 @@ class LeadControl(ControlSurface):
             tag = self._get_track_lead_control_tag(track)
             if tag is not None:
                 self._setup_lead_control_track(track, tag)
+        self._show_loaded_devices_message()
 
-    @log_function_call()
     def _get_track_lead_control_tag(self, track: any) -> Union[LeadControlTag, None]:
-        match = re.search(r'^\[(LC)(\d+)\]$', track.name)
+        match = re.search(r'\[(LC)(\d+)\]$', track.name)
         if isinstance(match, re.Match):
             match = match.group()
         if match is not None:
             return LeadControlTag.from_value(match)
         return None
 
-    @log_function_call()
     def _setup_lead_control_track(self, track: any, tag: LeadControlTag):
+        component: DeviceComponent = self.component_map["LeadControls"]
+        device = self._find_lead_control_device(track)
+        if device is None:
+            component.clear_device(tag)
+        else:
+            component.set_device(tag, device)
+        self._show_loaded_devices_message()
+
+    def _find_lead_control_device(self, track):
         for device in flatten_device_chain(track):
-            if device.name == "Lead Control":
-                component: DeviceComponent = self.component_map["LeadControls"]
-                component.set_device(tag, device)
+            if device.name == self._LEAD_CONTROL_M4L_DEVICE_NAME:
+                return device
+
+    def _show_loaded_devices_message(self):
+        active_tags = ", ".join(self._device_component.get_active_tags())
+        LOGGER.info(f"Loaded: {active_tags}")
+        self.show_message(f"Loaded: {active_tags}")
