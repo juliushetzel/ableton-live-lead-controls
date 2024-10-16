@@ -1,3 +1,4 @@
+import time
 from itertools import count
 from threading import Thread
 from typing import Callable
@@ -81,5 +82,9 @@ class PerformanceComponent(Component):
 
         if reset_all_on_next_scene_launch:
             LOGGER.info("Resetting all")
-            Thread(target=self._reset_all_devices_callback).start()
+            Thread(target=self._reset_all_devices_delayed).start()
         self._PerformanceComponent__on_scene_triggered_changed.subject = None
+
+    def _reset_all_devices_delayed(self):
+        time.sleep(0.1)
+        self._reset_all_devices_callback()

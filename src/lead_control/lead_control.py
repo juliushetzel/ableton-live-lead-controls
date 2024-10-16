@@ -12,9 +12,8 @@ from .specification import Specification
 from .tag import LeadControlTag
 
 
-# TODO navigation
 # TODO reload devices
-# TODO midi devices updaten, audio effect parameter Namen?
+# TODO Master device component
 
 class LeadControl(ControlSurface):
     _LEAD_CONTROL_M4L_DEVICE_NAME = "Lead Control"
