@@ -10,6 +10,7 @@ from .device_component import DeviceComponent
 from .logging import LOGGER, log_function_call
 from .specification import Specification
 from .tag import LeadControlTag
+from .utils import flatten_active_device_chain
 
 
 # TODO reload devices
@@ -75,7 +76,7 @@ class LeadControl(ControlSurface):
         self._show_loaded_devices_message()
 
     def _find_lead_control_device(self, track):
-        for device in flatten_device_chain(track):
+        for device in flatten_active_device_chain(track):
             if device.name == self._LEAD_CONTROL_M4L_DEVICE_NAME:
                 return device
 
