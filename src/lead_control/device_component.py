@@ -57,6 +57,10 @@ class DeviceComponent(Component):
         self._devices[tag] = device
         self._assign_device_to_controls(tag, device)
 
+    def clear_all_devices(self):
+        for tag in self._devices.keys():
+            self.clear_device(tag)
+
     def clear_device(self, tag: LeadControlTag):
         self._unassign_device_controls(tag)
         self._devices[tag] = None
