@@ -32,6 +32,7 @@ class LeadControl(ControlSurface):
         self._index_lead_controls()
         performance_component = self.component_map["PerformanceControls"]
         performance_component.set_reset_all_devices_callback(self._device_component.reset_all_devices)
+        performance_component.set_index_devices_callback(self._index_lead_controls)
 
     @listens("selected_track")
     def __on_selected_track_changed(self):
@@ -57,7 +58,7 @@ class LeadControl(ControlSurface):
         self._show_loaded_devices_message()
 
     def _get_track_lead_control_tag(self, track: any) -> Union[LeadControlTag, None]:
-        match = re.search(r'\[(LC)(\d+)\]$', track.name)
+        match = re.search(r'\[(LC)(\d+)\]', track.name)
         if isinstance(match, re.Match):
             match = match.group()
         if match is not None:

@@ -24,6 +24,7 @@ class PerformanceComponent(Component):
     ):
         super().__init__(name="PerformanceControls", *args, **kwargs)
         self._reset_all_devices_callback: Callable[[], None] = lambda: None
+        self._index_devices_callback: Callable[[], None] = lambda: None
         self._reset_all_on_next_scene_launch: bool = False
         self._session_ring = SessionRingComponent(
             name='Session_Ring',
@@ -49,6 +50,14 @@ class PerformanceComponent(Component):
 
     def set_reset_all_devices_callback(self, callback: Callable[[], None]):
         self._reset_all_devices_callback = callback
+
+    def set_index_devices_callback(self, callback: Callable[[], None]):
+        self._index_devices_callback = callback
+
+    @button_performance_switch.pressed
+    def _on_performance_switch_pressed(self, _):
+        if self.button_navigation_switch.is_pressed:
+            self._index_devices_callback()
 
     @button_reset_all.pressed
     def _on_reset_all_pressed(self, _):
@@ -82,9 +91,5 @@ class PerformanceComponent(Component):
 
         if reset_all_on_next_scene_launch:
             LOGGER.info("Resetting all")
-            Thread(target=self._reset_all_devices_delayed).start()
+            self._reset_all_devices_callback()
         self._PerformanceComponent__on_scene_triggered_changed.subject = None
-
-    def _reset_all_devices_delayed(self):
-        time.sleep(0.1)
-        self._reset_all_devices_callback()
