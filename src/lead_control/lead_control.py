@@ -4,16 +4,14 @@ from typing import Union
 from ableton.v2.base import listens
 from ableton.v3.control_surface import (
     ControlSurface, )
-from ableton.v3.live import flatten_device_chain
 
 from .device_component import DeviceComponent
 from .logging import LOGGER, log_function_call
 from .specification import Specification
 from .tag import LeadControlTag
-from .utils import flatten_active_device_chain
+from .utils import find_device
 
 
-# TODO reload devices
 # TODO Master device component
 
 class LeadControl(ControlSurface):
@@ -68,17 +66,15 @@ class LeadControl(ControlSurface):
 
     def _setup_lead_control_track(self, track: any, tag: LeadControlTag):
         component: DeviceComponent = self.component_map["LeadControls"]
-        device = self._find_lead_control_device(track)
+        device = find_device(track.devices, self._is_lead_control_device)
         if device is None:
             component.clear_device(tag)
         else:
             component.set_device(tag, device)
         self._show_loaded_devices_message()
 
-    def _find_lead_control_device(self, track):
-        for device in flatten_active_device_chain(track):
-            if device.name == self._LEAD_CONTROL_M4L_DEVICE_NAME:
-                return device
+    def _is_lead_control_device(self, device):
+        return device.name == self._LEAD_CONTROL_M4L_DEVICE_NAME
 
     def _show_loaded_devices_message(self):
         active_tags = ", ".join(self._device_component.get_active_tags())
