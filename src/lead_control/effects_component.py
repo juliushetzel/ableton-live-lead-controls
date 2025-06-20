@@ -1,7 +1,8 @@
 from ableton.v3.control_surface import Component
 from ableton.v3.control_surface.controls import (
     control_list,
-    MappedControl
+    MappedControl,
+    MappedButtonControl
 )
 from ableton.v3.live import get_parameter_by_name
 from ableton.v3.live.action import toggle_or_cycle_parameter_value
@@ -14,7 +15,7 @@ class EffectsComponent(Component):
     fx_buttons = control_list(MappedControl, control_count=7)
     fx_encoders = control_list(MappedControl, control_count=7)
 
-    reset_encoders_button = MappedControl()
+    reset_encoders_button = MappedButtonControl()
 
     @log_function_call()
     def __init__(
@@ -39,7 +40,7 @@ class EffectsComponent(Component):
 
     def set_fx_tracks(
             self,
-            tracks: list[any]
+            tracks: list
     ):
         self._unassign_controls()
 
@@ -70,12 +71,12 @@ class EffectsComponent(Component):
         LOGGER.info(f"Mapped '{device.name}/{mix.name}' to '{encoder.name}'")
 
 
-    def _find_parameters(self, device) -> tuple[any, any, any]:
+    def _find_parameters(self, device) -> tuple:
         on_off_toggle = get_parameter_by_name("ON/OFF", device)
         mix_poti = get_parameter_by_name("MIX", device)
         return (device, on_off_toggle, mix_poti)
 
-    def _find_all_fx_devices(self, devices) -> list[any]:
+    def _find_all_fx_devices(self, devices) -> list:
         devices = find_devices_by_prefix(devices, "LiveFX ")
         return devices
 

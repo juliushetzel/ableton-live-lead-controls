@@ -28,16 +28,18 @@ class LeadControl(ControlSurface):
         self._LeadControl__on_selected_track_changed.subject = self.song.view
         self._LeadControl__on_devices_changed.subject = self.song.view.selected_track
         self._device_component = self.component_map["LeadControls"]
-        self._index_lead_controls()
-        self._effects_component = self.component_map["EffectsComponent"]
+        self._effects_component = self.component_map["EffectControls"]
         performance_component = self.component_map["PerformanceControls"]
         performance_component.set_reset_all_devices_callbacks(
-            self._device_component.reset_all_devices,
-            self._effects_component.reset_toggle_buttons
+            [
+                self._device_component.reset_all_devices,
+                self._effects_component.reset_toggle_buttons
+            ]
         )
         performance_component.set_index_devices_callbacks(
-            self._index_lead_controls
+            [self._index_lead_controls]
         )
+        self._index_lead_controls()
 
     @listens("selected_track")
     def __on_selected_track_changed(self):
@@ -56,6 +58,7 @@ class LeadControl(ControlSurface):
         super().disconnect()
 
     def _index_lead_controls(self):
+        self.show_message("Indexing Lead Controls")
         tracks_with_fx_chains = []
         for track in self.song.tracks:
             tag = self._get_track_lead_control_tag(track)

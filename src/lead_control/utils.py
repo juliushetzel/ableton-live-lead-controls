@@ -4,7 +4,7 @@ from ableton.v3.live import is_device_rack
 def find_devices_by_prefix(devices, prefix):
     return find_devices(devices, lambda device: device.name.startwith(prefix))
 
-def find_devices(devices, predicate) -> list[any]:
+def find_devices(devices, predicate) -> list:
     result = []
     for device in devices or []:
         if not device.is_active:
@@ -15,7 +15,7 @@ def find_devices(devices, predicate) -> list[any]:
             result.extend(find_devices_in_chains(device.chains or [], predicate))
     return result
 
-def find_devices_in_chains(chains, predicate) -> list[any]:
+def find_devices_in_chains(chains, predicate) -> list:
     result = []
     for chain in chains:
         result.extend(find_devices(chain.devices or [], predicate))

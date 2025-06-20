@@ -23,8 +23,8 @@ class PerformanceComponent(Component):
             **kwargs
     ):
         super().__init__(name="PerformanceControls", *args, **kwargs)
-        self._reset_all_devices_callbacks: list[Callable[[], None]] = []
-        self._index_devices_callbacks: list[Callable[[], None]] = []
+        self._reset_all_devices_callbacks: list = []
+        self._index_devices_callbacks: list = []
         self._reset_all_on_next_scene_launch: bool = False
         self._session_ring = SessionRingComponent(
             name='Session_Ring',
@@ -48,14 +48,15 @@ class PerformanceComponent(Component):
         self._session_navigation.set_enabled(True)
         self._PerformanceComponent__on_session_ring_offset_changed.subject = self._session_ring
 
-    def set_reset_all_devices_callbacks(self, callbacks: list[Callable[[], None]]):
+    def set_reset_all_devices_callbacks(self, callbacks: list):
         self._reset_all_devices_callbacks = callbacks
 
-    def set_index_devices_callbacks(self, callbacks: list[Callable[[], None]]):
+    def set_index_devices_callbacks(self, callbacks: list):
         self._index_devices_callbacks = callbacks
 
     @button_performance_switch.pressed
     def _on_performance_switch_pressed(self, _):
+        LOGGER.info("Performance switch pressed")
         if self.button_navigation_switch.is_pressed:
             self._dispatch_index_devices()
 

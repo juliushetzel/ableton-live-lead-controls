@@ -18,7 +18,7 @@ class Elements(ElementsBase):
 
         add_button_matrix = partial(
             self.add_button_matrix,
-            channel=2,
+            channels=2,
             is_rgb=False,
             is_momentary=True
         )
