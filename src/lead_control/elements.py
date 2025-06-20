@@ -16,6 +16,29 @@ class Elements(ElementsBase):
             needs_takeover=False,
         )
 
+        add_button_matrix = partial(
+            self.add_button_matrix,
+            channel=2,
+            is_rgb=False,
+            is_momentary=True
+        )
+
+        self.add_button(1, channel=2, name="reset_encoders_button", is_rgb=False, is_momentary=True)
+
+        self.add_button(33, channel=2, name="navigation_switch_button", is_rgb=False, is_momentary=True)
+        add_button_matrix(
+            [
+                [34, 35 ,36 ,37, 38, 39, 40]
+            ],
+            base_name="fx_buttons"
+        )
+        add_encoder_matrix(
+            [
+                [2, 3, 4, 5, 6, 7, 8]
+            ],
+            base_name="fx_encoders"
+        )
+
         self.add_button(41, channel=2, name="Lc1_Reset_Button", is_rgb=False, is_momentary=False)
         self.add_button(43, channel=2, name="Lc2_Reset_Button", is_rgb=False, is_momentary=True)
         self.add_button(45, channel=2, name="Lc3_Reset_Button", is_rgb=False, is_momentary=True)
@@ -63,7 +86,6 @@ class Elements(ElementsBase):
             ],
             base_name="Lc5_Encoders"
         )
-        self.add_button(33, channel=2, name="navigation_switch_button", is_rgb=False, is_momentary=True)
 
         self.add_button(49, channel=2, name="reset_all_button", is_rgb=False, is_momentary=True)
         self.add_button(50, channel=2, name="previous_scene_button", is_rgb=False, is_momentary=True)

@@ -29,9 +29,15 @@ class LeadControl(ControlSurface):
         self._LeadControl__on_devices_changed.subject = self.song.view.selected_track
         self._device_component = self.component_map["LeadControls"]
         self._index_lead_controls()
+        self._effects_component = self.component_map["EffectsComponent"]
         performance_component = self.component_map["PerformanceControls"]
-        performance_component.set_reset_all_devices_callback(self._device_component.reset_all_devices)
-        performance_component.set_index_devices_callback(self._index_lead_controls)
+        performance_component.set_reset_all_devices_callbacks(
+            self._device_component.reset_all_devices,
+            self._effects_component.reset_toggle_buttons
+        )
+        performance_component.set_index_devices_callbacks(
+            self._index_lead_controls
+        )
 
     @listens("selected_track")
     def __on_selected_track_changed(self):
@@ -50,10 +56,14 @@ class LeadControl(ControlSurface):
         super().disconnect()
 
     def _index_lead_controls(self):
+        tracks_with_fx_chains = []
         for track in self.song.tracks:
             tag = self._get_track_lead_control_tag(track)
             if tag is not None:
                 self._setup_lead_control_track(track, tag)
+            if track.name in ["INSTRUMENTS", "DRUMS", "NOISE"]:
+                tracks_with_fx_chains.append(track)
+        self._effects_component.set_fx_tracks(tracks_with_fx_chains)
         self._show_loaded_devices_message()
 
     def _get_track_lead_control_tag(self, track: any) -> Union[LeadControlTag, None]:

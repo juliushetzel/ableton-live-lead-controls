@@ -1,6 +1,32 @@
 from ableton.v2.base import liveobj_valid
 from ableton.v3.live import is_device_rack
 
+def find_devices_by_prefix(devices, prefix):
+    return find_devices(devices, lambda device: device.name.startwith(prefix))
+
+def find_devices(devices, predicate) -> list[any]:
+    result = []
+    for device in devices or []:
+        if not device.is_active:
+            continue
+        if predicate(device):
+            result.append(device)
+        if is_device_rack(device):
+            result.extend(find_devices_in_chains(device.chains or [], predicate))
+    return result
+
+def find_devices_in_chains(chains, predicate) -> list[any]:
+    result = []
+    for chain in chains:
+        result.extend(find_devices(chain.devices or [], predicate))
+    return result
+
+def find_device_by_name(devices, name):
+    return find_device(devices, lambda device: device.name == name)
+
+def find_device_by_prefix(devices, prefix):
+    return find_device(devices, lambda device: device.name.startwith(prefix))
+
 def find_device(devices, predicate):
     for device in devices or []:
         if not device.is_active:

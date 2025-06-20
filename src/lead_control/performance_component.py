@@ -23,8 +23,8 @@ class PerformanceComponent(Component):
             **kwargs
     ):
         super().__init__(name="PerformanceControls", *args, **kwargs)
-        self._reset_all_devices_callback: Callable[[], None] = lambda: None
-        self._index_devices_callback: Callable[[], None] = lambda: None
+        self._reset_all_devices_callbacks: list[Callable[[], None]] = []
+        self._index_devices_callbacks: list[Callable[[], None]] = []
         self._reset_all_on_next_scene_launch: bool = False
         self._session_ring = SessionRingComponent(
             name='Session_Ring',
@@ -48,16 +48,16 @@ class PerformanceComponent(Component):
         self._session_navigation.set_enabled(True)
         self._PerformanceComponent__on_session_ring_offset_changed.subject = self._session_ring
 
-    def set_reset_all_devices_callback(self, callback: Callable[[], None]):
-        self._reset_all_devices_callback = callback
+    def set_reset_all_devices_callbacks(self, callbacks: list[Callable[[], None]]):
+        self._reset_all_devices_callbacks = callbacks
 
-    def set_index_devices_callback(self, callback: Callable[[], None]):
-        self._index_devices_callback = callback
+    def set_index_devices_callbacks(self, callbacks: list[Callable[[], None]]):
+        self._index_devices_callbacks = callbacks
 
     @button_performance_switch.pressed
     def _on_performance_switch_pressed(self, _):
         if self.button_navigation_switch.is_pressed:
-            self._index_devices_callback()
+            self._dispatch_index_devices()
 
     @button_reset_all.pressed
     def _on_reset_all_pressed(self, _):
@@ -65,7 +65,7 @@ class PerformanceComponent(Component):
             selected_scene = self._session.selected_scene().scene
             action.fire(selected_scene, button_state=True)
         else:
-            self._reset_all_devices_callback()
+            self._dispatch_reset_all_devices()
 
     @listens("offset")
     def __on_session_ring_offset_changed(self, _: int, vertical_offset: int):
@@ -91,5 +91,13 @@ class PerformanceComponent(Component):
 
         if reset_all_on_next_scene_launch:
             LOGGER.info("Resetting all")
-            self._reset_all_devices_callback()
+            self._dispatch_reset_all_devices()
         self._PerformanceComponent__on_scene_triggered_changed.subject = None
+
+    def _dispatch_reset_all_devices(self):
+        for callback in self._reset_all_devices_callbacks:
+            callback()
+
+    def _dispatch_index_devices(self):
+        for callback in self._index_devices_callbacks:
+            callback()
