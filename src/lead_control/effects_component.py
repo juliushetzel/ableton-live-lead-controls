@@ -72,8 +72,13 @@ class EffectsComponent(Component):
 
 
     def _find_parameters(self, device) -> tuple:
-        on_off_toggle = get_parameter_by_name("ON/OFF", device)
-        mix_poti = get_parameter_by_name("MIX", device)
+        on_off_toggle = None
+        mix_poti = None
+        for parameter in device.parameters:
+            if parameter.name == "ON/OFF":
+                on_off_toggle = parameter
+            if parameter.name == "MIX":
+                mix_poti = parameter
         return (device, on_off_toggle, mix_poti)
 
     def _find_all_fx_devices(self, devices) -> list:
