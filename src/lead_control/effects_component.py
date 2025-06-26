@@ -24,7 +24,7 @@ class EffectsComponent(Component):
             **kwargs
     ):
         super().__init__(name="EffectControls", *args, **kwargs)
-        self._reset_params: dict[int, any] = {}
+        self._reset_params: dict = {}
 
     @reset_encoders_button.pressed
     def _reset_all_controls(self, _):
@@ -43,7 +43,7 @@ class EffectsComponent(Component):
             tracks: list
     ):
         self._unassign_controls()
-
+        control_index = 0
         for track_index, track in enumerate(tracks):
             fx_devices_chain = find_device_by_name(track.devices, "FX CHAIN")
             if fx_devices_chain is None:
@@ -52,11 +52,11 @@ class EffectsComponent(Component):
             all_devices = flatten_chains(fx_devices_chain.chains)
             fx_devices = find_devices_by_prefix(all_devices, "LiveFX ")
 
-            for device_count in fx_devices:
-                control_index = device_count + track_index
+            for device in fx_devices:
                 if control_index >= 7:
                     LOGGER.info(f"Only 7 controls allowed")
-                self._assign_controls(control_index, fx_devices[device_count])
+                self._assign_controls(control_index, device)
+                control_index = control_index + 1
 
 
     def _assign_controls(self, control_index, device):
