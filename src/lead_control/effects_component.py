@@ -8,7 +8,7 @@ from ableton.v3.live import get_parameter_by_name
 from ableton.v3.live.action import toggle_or_cycle_parameter_value, action
 
 from .logging import log_function_call, LOGGER
-from .utils import find_device_by_name, flatten_chains, find_devices_by_prefix
+from .utils import find_device_by_name, flatten_chains, find_devices_by_prefix, find_device_by_prefix
 
 
 class EffectsComponent(Component):
@@ -48,7 +48,7 @@ class EffectsComponent(Component):
         self._unassign_controls()
         control_index = 0
         for track_index, track in enumerate(tracks):
-            fx_devices_chain = find_device_by_name(track.devices, "FX CHAIN")
+            fx_devices_chain = find_device_by_prefix(track.devices, "FX CHAIN")
             if fx_devices_chain is None:
                 return
 
