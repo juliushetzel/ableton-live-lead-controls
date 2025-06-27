@@ -19,8 +19,7 @@ class Elements(ElementsBase):
         add_button_matrix = partial(
             self.add_button_matrix,
             channels=2,
-            is_rgb=False,
-            is_momentary=True
+            is_rgb=False
         )
 
         self.add_button(1, channel=2, name="reset_encoders_button", is_rgb=False, is_momentary=True)
@@ -30,7 +29,8 @@ class Elements(ElementsBase):
             [
                 [34, 35 ,36 ,37, 38, 39, 40]
             ],
-            base_name="fx_buttons"
+            base_name="fx_buttons",
+            is_momentary=False
         )
         add_encoder_matrix(
             [

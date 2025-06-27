@@ -2,10 +2,10 @@ from ableton.v3.control_surface import Component
 from ableton.v3.control_surface.controls import (
     control_list,
     MappedControl,
-    MappedButtonControl
+    ButtonControl
 )
 from ableton.v3.live import get_parameter_by_name
-from ableton.v3.live.action import toggle_or_cycle_parameter_value
+from ableton.v3.live.action import toggle_or_cycle_parameter_value, action
 
 from .logging import log_function_call, LOGGER
 from .utils import find_device_by_name, flatten_chains, find_devices_by_prefix
@@ -15,7 +15,7 @@ class EffectsComponent(Component):
     fx_buttons = control_list(MappedControl, control_count=7)
     fx_encoders = control_list(MappedControl, control_count=7)
 
-    reset_encoders_button = MappedButtonControl()
+    reset_encoders_button = ButtonControl()
 
     @log_function_call()
     def __init__(
@@ -28,15 +28,18 @@ class EffectsComponent(Component):
 
     @reset_encoders_button.pressed
     def _reset_all_controls(self, _):
-        for encoder in self.fx_encoders:
-            if encoder.mapped_parameter:
-                toggle_or_cycle_parameter_value(encoder.mapped_parameter)
-        self.reset_toggle_buttons()
+        self._set_mapped_controls_state(self.fx_encoders, False)
+        self._set_mapped_controls_state(self.fx_buttons, True)
+
+    def _set_mapped_controls_state(self, controls, enabled):
+        for control in controls:
+            if control.mapped_parameter is None:
+                continue
+            value = control.mapped_parameter.max if enabled else control.mapped_parameter.min
+            control.mapped_parameter.value = value
 
     def reset_toggle_buttons(self):
-        for button in self.fx_buttons:
-            if button.mapped_parameter is not None:
-                toggle_or_cycle_parameter_value(button.mapped_parameter)
+        _set_mapped_controls_state(self.fx_buttons, False)
 
     def set_fx_tracks(
             self,
