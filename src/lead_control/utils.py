@@ -25,7 +25,7 @@ def find_device_by_name(devices, name):
     return find_device(devices, lambda device: device.name == name)
 
 def find_device_by_prefix(devices, prefix):
-    return find_device(devices, lambda device: device.name.startwith(prefix))
+    return find_device(devices, lambda device: device.name.startswith(prefix))
 
 def find_device(devices, predicate):
     for device in devices or []:
