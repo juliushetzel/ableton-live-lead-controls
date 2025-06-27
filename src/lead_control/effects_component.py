@@ -39,7 +39,7 @@ class EffectsComponent(Component):
             control.mapped_parameter.value = value
 
     def reset_toggle_buttons(self):
-        _set_mapped_controls_state(self.fx_buttons, False)
+        self._set_mapped_controls_state(self.fx_buttons, False)
 
     def set_fx_tracks(
             self,
