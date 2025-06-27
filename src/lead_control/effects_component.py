@@ -55,6 +55,7 @@ class EffectsComponent(Component):
             for device in fx_devices:
                 if control_index >= 7:
                     LOGGER.info(f"Only 7 controls allowed")
+                    return
                 self._assign_controls(control_index, device)
                 control_index = control_index + 1
 
@@ -66,9 +67,9 @@ class EffectsComponent(Component):
         parameters = self._find_parameters(device)
         device, toggle, mix = parameters
         button.mapped_parameter = toggle
-        LOGGER.info(f"Mapped '{device.name}/{toggle.name}' to '{encoder.name}'")
+        LOGGER.info(f"Mapped '{device.name}/{toggle.name}' to 'button/{control_index}'")
         encoder.mapped_parameter = mix
-        LOGGER.info(f"Mapped '{device.name}/{mix.name}' to '{encoder.name}'")
+        LOGGER.info(f"Mapped '{device.name}/{mix.name}' to 'encoder/{control_index}'")
 
 
     def _find_parameters(self, device) -> tuple:
@@ -79,6 +80,8 @@ class EffectsComponent(Component):
                 on_off_toggle = parameter
             if parameter.name == "MIX":
                 mix_poti = parameter
+        if None in (on_off_toggle, mix_poti):
+            raise Exception(f"Could not find 'ON/OFF' or 'MIX' parameter for '{device.name}'")
         return (device, on_off_toggle, mix_poti)
 
     def _find_all_fx_devices(self, devices) -> list:
