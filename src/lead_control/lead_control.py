@@ -66,6 +66,8 @@ class LeadControl(ControlSurface):
                 self._setup_lead_control_track(track, tag)
             if track.name in ["INSTRUMENTS", "DRUMS", "NOISE"]:
                 tracks_with_fx_chains.append(track)
+            if track.name == "KICK":
+                tracks_with_fx_chains.insert(0, track)
         self._effects_component.set_fx_tracks(tracks_with_fx_chains)
         self._show_loaded_devices_message()
 
